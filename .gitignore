@@ -1,4 +1,5 @@
 venv/
 .mypy_cache/
+.cache/
 __pycache__/
 config.ini

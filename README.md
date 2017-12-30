@@ -19,3 +19,9 @@ You can test to make sure Twitter connectivity works with:
 ```
 python cli.py test_api
 ```
+
+You can also run the test suite:
+
+```
+pytest
+```
