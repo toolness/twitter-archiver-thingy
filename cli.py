@@ -1,19 +1,8 @@
 import sys
 
-from configparser import ConfigParser, SectionProxy
-from pathlib import Path
-
 import click
-from requests_oauthlib import OAuth1Session
 
-
-CONFIG_FILE = Path("config.ini")
-
-
-def get_config() -> SectionProxy:
-    config = ConfigParser()
-    config.read(CONFIG_FILE)
-    return config['twitblog']
+from twitblog.client import get_session
 
 
 @click.group()
@@ -25,13 +14,7 @@ def cli() -> None:
 def test_api() -> None:
     """Test the Twitter API to make sure it works."""
 
-    config = get_config()
-    twitter = OAuth1Session(
-        config['ConsumerKey'],
-        client_secret=config['ConsumerSecret'],
-        resource_owner_key=config['AccessToken'],
-        resource_owner_secret=config['AccessTokenSecret'],
-    )
+    twitter = get_session()
     r = twitter.get('https://api.twitter.com/1.1/trends/available.json')
     if r.status_code == 200:
         click.echo("Cool, everything works.")
