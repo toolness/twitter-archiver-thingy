@@ -1,4 +1,5 @@
 import sys
+import re
 from typing import Optional, Iterator
 
 import click
@@ -79,6 +80,17 @@ def show_cached_tweets() -> None:
     '''
 
     show_tweets(Tweet.from_cache(get_cache()))
+
+
+@cli.command()
+@click.argument('pattern')
+def grep(pattern) -> None:
+    print(repr(pattern))
+    show_tweets(
+        tweet for tweet in Tweet.from_cache(get_cache())
+        if (re.search(pattern, tweet.text, re.I) or
+            re.search(pattern, tweet.screen_name, re.I))
+    )
 
 
 if __name__ == '__main__':
