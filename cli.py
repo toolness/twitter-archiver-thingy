@@ -3,7 +3,7 @@ from typing import Optional
 
 import click
 
-from twitblog.client import get_session
+from twitblog.session import get_session
 from twitblog.util import parse_status_url
 
 
