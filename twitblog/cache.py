@@ -1,5 +1,7 @@
 import abc
+import json
 from typing import Any, Dict
+from pathlib import Path
 
 
 class Cache(abc.ABC):
@@ -37,3 +39,29 @@ class InMemoryCache(Cache):
 
     def set(self, key: str, value: Any) -> None:
         self._entries[key] = value
+
+
+class DiskCache(Cache):
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        if not self.path.exists():
+            self.path.mkdir()
+
+    def _keypath(self, key:str) -> Path:
+        return self.path / f'{key}.json'
+
+    def get(self, key: str) -> Any:
+        path = self._keypath(key)
+        if not path.exists():
+            return None
+        return json.loads(path.read_text())
+
+    def has(self, key: str) -> bool:
+        return self._keypath(key).exists()
+
+    def set(self, key: str, value: Any) -> None:
+        self._keypath(key).write_text(json.dumps(
+            value,
+            sort_keys=True,
+            indent=2,
+        ))
