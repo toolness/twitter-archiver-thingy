@@ -1,5 +1,5 @@
 import sys
-from typing import Optional
+from typing import Optional, Iterator
 
 import click
 
@@ -27,6 +27,11 @@ def test_api() -> None:
         sys.exit(1)
 
 
+def show_tweets(iterator: Iterator[Tweet]) -> None:
+    for tweet in iterator:
+        click.echo(str(tweet))
+
+
 @cli.command()
 @click.argument('url')
 def show_thread(url: str) -> None:
@@ -36,9 +41,7 @@ def show_thread(url: str) -> None:
     The given URL should be the *last* tweet in the thread.
     '''
 
-    twitter = get_session()
-    for tweet in twitter.iter_reply(parse_status_url(url)):
-        click.echo(str(tweet))
+    show_tweets(get_session().iter_reply(parse_status_url(url)))
 
 
 @cli.command()
@@ -51,9 +54,7 @@ def show_favorites(older: bool, forever: bool) -> None:
     Show the authenticating user's favorites.
     '''
 
-    twitter = get_session()
-    for tweet in twitter.iter_favorites(older=older, forever=forever):
-        click.echo(str(tweet))
+    show_tweets(get_session().iter_favorites(older=older, forever=forever))
 
 
 @cli.command()
@@ -67,10 +68,8 @@ def show_timeline(screen_name: str, older: bool, forever: bool) -> None:
     Show the timeline of the given user.
     '''
 
-    twitter = get_session()
-    for tweet in twitter.iter_timeline(screen_name, older=older,
-                                       forever=forever):
-        click.echo(str(tweet))
+    show_tweets(get_session().iter_timeline(screen_name, older=older,
+                                            forever=forever))
 
 
 @cli.command()
@@ -79,8 +78,7 @@ def show_cached_tweets() -> None:
     Show all cached tweets.
     '''
 
-    for tweet in Tweet.from_cache(get_cache()):
-        click.echo(str(tweet))
+    show_tweets(Tweet.from_cache(get_cache()))
 
 
 if __name__ == '__main__':
