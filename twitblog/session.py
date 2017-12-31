@@ -1,7 +1,6 @@
 from typing import Optional, Iterator
 from requests_oauthlib import OAuth1Session
 
-from .config import get_config
 from .tweet import Tweet
 
 
@@ -29,13 +28,3 @@ class TwitterSession(OAuth1Session):
             tweet = self.get_tweet(status_id)
             status_id = tweet.in_reply_to
             yield tweet
-
-
-def get_session() -> TwitterSession:
-    config = get_config()
-    return TwitterSession(
-        client_key=config['ConsumerKey'],
-        client_secret=config['ConsumerSecret'],
-        resource_owner_key=config['AccessToken'],
-        resource_owner_secret=config['AccessTokenSecret'],
-    )
