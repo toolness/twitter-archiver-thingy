@@ -1,6 +1,6 @@
 import abc
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Iterator
 from pathlib import Path
 
 
@@ -15,6 +15,10 @@ class Cache(abc.ABC):
 
     @abc.abstractmethod
     def set(self, key: str, value: Any) -> None:
+        pass
+
+    @abc.abstractmethod
+    def iterkeys(self) -> Iterator[str]:
         pass
 
     def __contains__(self, item: str) -> bool:
@@ -40,6 +44,11 @@ class InMemoryCache(Cache):
     def set(self, key: str, value: Any) -> None:
         self._entries[key] = value
 
+    def iterkeys(self) -> Iterator[str]:
+        for key in self._entries:
+            yield key
+
+
 class DiskCache(Cache):
     def __init__(self, path: Path) -> None:
         self.path = path
@@ -64,3 +73,8 @@ class DiskCache(Cache):
             sort_keys=True,
             indent=2,
         ))
+
+    def iterkeys(self) -> Iterator[str]:
+        for path in self.path.iterdir():
+            if path.suffix == '.json':
+                yield path.stem

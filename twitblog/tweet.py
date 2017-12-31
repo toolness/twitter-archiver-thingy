@@ -1,4 +1,7 @@
+import re
 from typing import Optional, Any, Iterator
+
+from .cache import Cache
 
 
 class Tweet:
@@ -28,3 +31,9 @@ class Tweet:
     def from_json_list(cls, blob_list: Any) -> Iterator['Tweet']:
         for blob in blob_list:
             yield cls.from_json(blob)
+
+    @classmethod
+    def from_cache(cls, cache: Cache) -> Iterator['Tweet']:
+        for key in cache.iterkeys():
+            if re.match(r'^[0-9]+$', key):
+                yield cls.from_json(cache.get(key))

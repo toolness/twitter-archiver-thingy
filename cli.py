@@ -3,7 +3,8 @@ from typing import Optional
 
 import click
 
-from twitblog.config import get_session
+from twitblog.config import get_session, get_cache
+from twitblog.tweet import Tweet
 from twitblog.util import parse_status_url
 
 
@@ -69,6 +70,16 @@ def show_timeline(screen_name: str, older: bool, forever: bool) -> None:
     twitter = get_session()
     for tweet in twitter.iter_timeline(screen_name, older=older,
                                        forever=forever):
+        click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
+
+
+@cli.command()
+def show_cached_tweets() -> None:
+    '''
+    Show all cached tweets.
+    '''
+
+    for tweet in Tweet.from_cache(get_cache()):
         click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
 
 
