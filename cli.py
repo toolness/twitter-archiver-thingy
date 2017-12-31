@@ -28,7 +28,7 @@ def test_api() -> None:
 
 @cli.command()
 @click.argument('url')
-def show_thread(url) -> None:
+def show_thread(url: str) -> None:
     '''
     Show a twitter thread.
 
@@ -50,6 +50,20 @@ def show_favorites(older: bool) -> None:
 
     twitter = get_session()
     for tweet in twitter.iter_favorites(older=older):
+        click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
+
+
+@cli.command()
+@click.argument('screen_name')
+@click.option('--older', is_flag=True,
+              help='Show older tweets, instead of newer ones.')
+def show_timeline(screen_name: str, older: bool) -> None:
+    '''
+    Show the timeline of the given user.
+    '''
+
+    twitter = get_session()
+    for tweet in twitter.iter_timeline(screen_name, older=older):
         click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
 
 

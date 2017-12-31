@@ -75,6 +75,26 @@ class TwitterSession(OAuth1Session):
             status_id = tweet.in_reply_to
             yield tweet
 
+    def iter_timeline(self, screen_name: str,
+                      older: bool=False) -> Iterator[Tweet]:
+        stats_key = f'timeline_{screen_name}'
+        stats = StatusStats.from_cache(self.cache[stats_key])
+        params = {
+            'screen_name': screen_name,
+            'count': MAX_COUNT,
+            **stats.as_params(older),
+            **BASE_PARAMS
+        }
+
+        r = self.get(f'{BASE_URL}/statuses/user_timeline.json', params=params)
+        r.raise_for_status()
+
+        for tweet in Tweet.from_json_list(r.json()):
+            stats = stats.update(tweet.id_str)
+            self.cache[stats_key] = stats
+            self.cache[tweet.id_str] = tweet.original_json
+            yield tweet
+
     def iter_favorites(self, older: bool=False) -> Iterator[Tweet]:
         stats = StatusStats.from_cache(self.cache['favorites'])
         params = {
