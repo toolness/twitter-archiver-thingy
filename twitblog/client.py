@@ -18,7 +18,7 @@ class Tweet:
     @classmethod
     def from_json(cls, blob: Any) -> 'Tweet':
         return Tweet(
-            text=blob['text'],
+            text=blob['full_text'],
             screen_name=blob['user']['screen_name'],
             in_reply_to=blob['in_reply_to_status_id_str'],
             original_json=blob,
@@ -39,6 +39,7 @@ class TwitterSession(OAuth1Session):
     def get_tweet(self, status_id: str) -> Tweet:
         r = self.get(
             f'https://api.twitter.com/1.1/statuses/show/{status_id}.json'
+            f'?tweet_mode=extended'
         )
         r.raise_for_status()
         return Tweet.from_json(r.json())
