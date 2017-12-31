@@ -1,4 +1,4 @@
-from typing import Optional, Iterator, NamedTuple, Any, Mapping
+from typing import Optional, Iterator, NamedTuple, Any, Mapping, Callable
 from requests_oauthlib import OAuth1Session
 
 from .tweet import Tweet
@@ -12,6 +12,26 @@ BASE_PARAMS = {
 }
 
 MAX_COUNT = '200'
+
+
+TweetGenerator = Callable[[], Iterator[Tweet]]
+
+
+def repeat_until_exhausted(func: TweetGenerator) -> Iterator[Tweet]:
+    done = False
+    while not done:
+        count = 0
+        for tweet in func():
+            count += 1
+            yield tweet
+        if count == 0:
+            done = True
+
+
+def maybe_repeat_until_exhausted(func: TweetGenerator,
+                                 forever: bool) -> Iterator[Tweet]:
+    for tweet in repeat_until_exhausted(func) if forever else func():
+        yield tweet
 
 
 class StatusStats(NamedTuple):
@@ -42,7 +62,9 @@ class StatusStats(NamedTuple):
 
     def as_params(self, older: bool) -> Mapping[str, str]:
         if older:
-            return {'max_id': self.min_id} if self.min_id else {}
+            return {
+                'max_id': str(int(self.min_id) - 1)
+            } if self.min_id else {}
         return {'since_id': self.max_id} if self.max_id else {}
 
 
@@ -75,8 +97,8 @@ class TwitterSession(OAuth1Session):
             status_id = tweet.in_reply_to
             yield tweet
 
-    def iter_timeline(self, screen_name: str,
-                      older: bool=False) -> Iterator[Tweet]:
+    def _iter_timeline_once(self, screen_name: str,
+                            older: bool) -> Iterator[Tweet]:
         stats_key = f'timeline_{screen_name}'
         stats = StatusStats.from_cache(self.cache[stats_key])
         params = {
@@ -95,7 +117,14 @@ class TwitterSession(OAuth1Session):
             self.cache[tweet.id_str] = tweet.original_json
             yield tweet
 
-    def iter_favorites(self, older: bool=False) -> Iterator[Tweet]:
+    def iter_timeline(self, screen_name: str,
+                      older: bool=False,
+                      forever: bool=False) -> Iterator[Tweet]:
+        func = lambda: self._iter_timeline_once(screen_name, older=older)
+        for tweet in maybe_repeat_until_exhausted(func, forever):
+            yield tweet
+
+    def _iter_favorites_once(self, older: bool) -> Iterator[Tweet]:
         stats = StatusStats.from_cache(self.cache['favorites'])
         params = {
             'count': MAX_COUNT,
@@ -110,4 +139,10 @@ class TwitterSession(OAuth1Session):
             stats = stats.update(tweet.id_str)
             self.cache['favorites'] = stats
             self.cache[tweet.id_str] = tweet.original_json
+            yield tweet
+
+    def iter_favorites(self, older: bool=False,
+                       forever: bool=False) -> Iterator[Tweet]:
+        func = lambda: self._iter_favorites_once(older=older)
+        for tweet in maybe_repeat_until_exhausted(func, forever):
             yield tweet

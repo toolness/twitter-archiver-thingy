@@ -43,13 +43,15 @@ def show_thread(url: str) -> None:
 @cli.command()
 @click.option('--older', is_flag=True,
               help='Show older favorites, instead of newer ones.')
-def show_favorites(older: bool) -> None:
+@click.option('--forever', is_flag=True,
+              help='Repeat until all tweets are retrieved.')
+def show_favorites(older: bool, forever: bool) -> None:
     '''
     Show the authenticating user's favorites.
     '''
 
     twitter = get_session()
-    for tweet in twitter.iter_favorites(older=older):
+    for tweet in twitter.iter_favorites(older=older, forever=forever):
         click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
 
 
@@ -57,13 +59,16 @@ def show_favorites(older: bool) -> None:
 @click.argument('screen_name')
 @click.option('--older', is_flag=True,
               help='Show older tweets, instead of newer ones.')
-def show_timeline(screen_name: str, older: bool) -> None:
+@click.option('--forever', is_flag=True,
+              help='Repeat until all tweets are retrieved.')
+def show_timeline(screen_name: str, older: bool, forever: bool) -> None:
     '''
     Show the timeline of the given user.
     '''
 
     twitter = get_session()
-    for tweet in twitter.iter_timeline(screen_name, older=older):
+    for tweet in twitter.iter_timeline(screen_name, older=older,
+                                       forever=forever):
         click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
 
 

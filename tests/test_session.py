@@ -5,7 +5,7 @@ def test_statusstats_as_params_works():
     assert StatusStats.empty().as_params(older=False) == {}
     assert StatusStats.empty().as_params(older=True) == {}
     assert StatusStats('1', '5').as_params(older=True) == {
-        'max_id': '1'
+        'max_id': '0'
     }
     assert StatusStats('1', '5').as_params(older=False) == {
         'since_id': '5'
