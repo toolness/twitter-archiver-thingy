@@ -37,7 +37,20 @@ def show_thread(url) -> None:
 
     twitter = get_session()
     for tweet in twitter.iter_reply(parse_status_url(url)):
-        print(tweet.text)
+        click.echo(tweet.text)
+
+
+@cli.command()
+@click.option('--older', is_flag=True,
+              help='Show older favorites, instead of newer ones.')
+def show_favorites(older: bool) -> None:
+    '''
+    Show the authenticating user's favorites.
+    '''
+
+    twitter = get_session()
+    for tweet in twitter.iter_favorites(older=older):
+        click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
 
 
 if __name__ == '__main__':
