@@ -2,7 +2,7 @@ This is a program that converts Twitter threads into blog posts.
 
 ## Quick start
 
-This requires Python 3.6 or higher.
+This requires Python 3.6.4 or higher.
 
 ```
 python3 -m venv venv

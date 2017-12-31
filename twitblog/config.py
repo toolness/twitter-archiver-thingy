@@ -17,7 +17,7 @@ CONFIG_FILE = ROOT_DIR / "config.ini"
 
 def get_config() -> SectionProxy:
     config = ConfigParser()
-    config.read(str(CONFIG_FILE))
+    config.read(CONFIG_FILE)
     return config['twitblog']
 
 

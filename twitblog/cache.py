@@ -40,7 +40,6 @@ class InMemoryCache(Cache):
     def set(self, key: str, value: Any) -> None:
         self._entries[key] = value
 
-
 class DiskCache(Cache):
     def __init__(self, path: Path) -> None:
         self.path = path
