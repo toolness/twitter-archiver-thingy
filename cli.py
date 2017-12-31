@@ -38,7 +38,7 @@ def show_thread(url: str) -> None:
 
     twitter = get_session()
     for tweet in twitter.iter_reply(parse_status_url(url)):
-        click.echo(tweet.text)
+        click.echo(str(tweet))
 
 
 @cli.command()
@@ -53,7 +53,7 @@ def show_favorites(older: bool, forever: bool) -> None:
 
     twitter = get_session()
     for tweet in twitter.iter_favorites(older=older, forever=forever):
-        click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
+        click.echo(str(tweet))
 
 
 @cli.command()
@@ -70,7 +70,7 @@ def show_timeline(screen_name: str, older: bool, forever: bool) -> None:
     twitter = get_session()
     for tweet in twitter.iter_timeline(screen_name, older=older,
                                        forever=forever):
-        click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
+        click.echo(str(tweet))
 
 
 @cli.command()
@@ -80,7 +80,7 @@ def show_cached_tweets() -> None:
     '''
 
     for tweet in Tweet.from_cache(get_cache()):
-        click.echo(f'{tweet.id_str} @{tweet.screen_name}: {tweet.text}')
+        click.echo(str(tweet))
 
 
 if __name__ == '__main__':

@@ -17,6 +17,9 @@ class Tweet:
         self.in_reply_to = in_reply_to
         self.original_json = original_json
 
+    def __str__(self) -> str:
+        return f'{self.id_str} @{self.screen_name}: {self.text}'
+
     @classmethod
     def from_json(cls, blob: Any) -> 'Tweet':
         return Tweet(
