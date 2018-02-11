@@ -85,7 +85,10 @@ def show_cached_tweets() -> None:
 @cli.command()
 @click.argument('pattern')
 def grep(pattern) -> None:
-    print(repr(pattern))
+    '''
+    Search all cached tweets for a pattern.
+    '''
+
     show_tweets(
         tweet for tweet in Tweet.from_cache(get_cache())
         if (re.search(pattern, tweet.text, re.I) or
