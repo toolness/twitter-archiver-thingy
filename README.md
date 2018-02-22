@@ -1,4 +1,4 @@
-This is a command-line utility that provides a variety of tools useful for
+This is a command-line utility that provides a variety of tools for
 archiving Twitter data.
 
 ## Quick start
