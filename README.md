@@ -1,4 +1,5 @@
-This is a program that converts Twitter threads into blog posts.
+This is a command-line utility that provides a variety of tools useful for
+archiving Twitter data.
 
 ## Quick start
 
